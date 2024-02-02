@@ -26,10 +26,9 @@ public:
         head = new_data;
     }
 
-    bool pop() {
-        if (empty()) {
+    void pop() {
+        if (empty())
             throw out_of_range("Stack is Empty!");
-        }
         len--;
         node<T> *temp = head;
         head = head->next;
