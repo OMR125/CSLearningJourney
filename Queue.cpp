@@ -44,7 +44,7 @@ public:
         return !len;
     }
     int top(){
-        return !empty() ? tail->data : throw out_of_range("NIGGER");
+        return !empty() ? tail->data : throw out_of_range("Queue is Empty");
     }
     bool find(int x){
         node*temp = tail;
