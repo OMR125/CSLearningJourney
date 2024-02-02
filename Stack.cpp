@@ -2,23 +2,25 @@
 
 using namespace std;
 
+template<typename T>
 struct node {
-    int data;
+    T data;
     node *next = nullptr;
 
-    node(int x) {
+    node(T x) {
         data = x;
     }
 };
 
+template<typename T>
 class Stack {
 private:
-    node *head;
+    node<T> *head;
     int len = 0;
 public:
-    void push(int x) {
+    void push(T x) {
         len++;
-        node *new_data = new node(x);
+        node<T> *new_data = new node(x);
         if (!empty())
             new_data->next = head;
         head = new_data;
@@ -29,12 +31,12 @@ public:
             throw out_of_range("Stack is Empty!");
         }
         len--;
-        node *temp = head;
+        node<T> *temp = head;
         head = head->next;
         delete temp;
     }
 
-    int top() {
+    T top() {
         return !empty() ? head->data : throw out_of_range("Stack is Empty!");
     }
 
@@ -48,7 +50,7 @@ public:
 };
 
 int main() {
-    Stack s;
+    Stack<int> s;
     s.push(1);
     s.push(2);
     s.push(3);
@@ -56,10 +58,12 @@ int main() {
         cout << s.top() << "\n";
         s.pop();
     }
-    s.push(2);
-    s.push(3);
-    s.pop();
-    cout << s.top();
-    cout << s.pop();
-    s.pop();
+    Stack<float> x;
+    x.push((float) 1.5);
+    x.push(2.5);
+    cout << "\n";
+    while (!x.empty()) {
+        cout << x.top() << "\n";
+        x.pop();
+    }
 }
