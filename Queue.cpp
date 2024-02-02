@@ -2,75 +2,80 @@
 
 using namespace std;
 
+template<typename T>
 struct node {
-    int data = 0;
-    node *next = nullptr;
-    node *prev = nullptr;
-    node(int _data, node *_next, node* _prev) {
+    T data;
+    node<T> *next = nullptr;
+    node<T> *prev = nullptr;
+
+    node(T _data) {
         data = _data;
-        next = _next;
-        prev = _prev;
     }
 };
 
+template<typename T>
 class Queue {
 private:
-    node *head;
-    node *tail;
+    node<T> *head;
+    node<T> *tail;
     int len = 0;
 public:
-    void push(int x){
-        node* new_data = new node(x, nullptr, nullptr);
-        if(empty()){
+    void push(T x) {
+        node<T> *new_data = new node(x);
+        if (empty()) {
             tail = new_data;
-        }else {
+        } else {
             head->prev = new_data;
             new_data->next = head;
         }
         head = new_data;
         len++;
     }
-    bool pop(){
-        if(empty())
-            return false;
+
+    void pop() {
+        if (empty())
+            throw out_of_range("Queue is Empty");
         len--;
-        node* temp = tail;
-        tail->next= nullptr;
+        node<T> *temp = tail;
+        tail->next = nullptr;
         tail = tail->prev;
         delete temp;
-        return true;
     }
-    bool empty(){
+
+    bool empty() {
         return !len;
     }
-    int top(){
+
+    T top() {
         return !empty() ? tail->data : throw out_of_range("Queue is Empty");
     }
-    bool find(int x){
-        node*temp = tail;
-        while(temp!= nullptr){
-            if(temp->data==x){
+
+    bool find(int x) {
+        node<T> *temp = tail;
+        while (temp != nullptr) {
+            if (temp->data == x) {
                 return true;
             }
-            temp=temp->prev;
+            temp = temp->prev;
         }
         return false;
     }
-    void clear(){
-        while(!empty()){
+
+    void clear() {
+        while (!empty()) {
             pop();
         }
     }
 };
 
 int main() {
-    Queue x;
-    x.push(1);
+    Queue<float> x;
+    x.push(1.5);
     x.push(2);
     x.push(4);
     x.push(88);
     x.clear();
-    x.push(33);
+    x.push(33.6969);
     x.push(23);
     cout << x.top() << "\n";
     x.pop();
