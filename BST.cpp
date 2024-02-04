@@ -21,7 +21,7 @@ private:
 private:
     node<T> *insert(node<T> *u, T x) {
         if (u == nullptr || empty())
-            u = new node(x);
+            u = new node<T>(x);
         else if (x >= u->data)
             u->right = insert(u->right, x);
         else
