@@ -2,22 +2,24 @@
 
 using namespace std;
 
+template<typename T>
 struct node {
-    int data;
+    T data;
     node *left = nullptr;
     node *right = nullptr;
 
-    node(int x) {
+    node(T x) {
         data = x;
     }
 };
 
+template<typename T>
 class BST {
 private:
-    node *root;
+    node<T> *root;
     int len = 0;
-public:
-    node *insert(node *u, int x) {
+private:
+    node<T> *insert(node<T> *u, T x) {
         if (u == nullptr || empty())
             u = new node(x);
         else if (x >= u->data)
@@ -27,29 +29,78 @@ public:
         return u;
     }
 
-    void insert(int x) {
+    node<T> *max(node<T> *u) {
+        if (u->right == nullptr)
+            return u;
+        max(u->right);
+    }
+
+    node<T> *search(node<T> *u, T x) {
+        if (u == nullptr)
+            return nullptr;
+        if (x == u->data)
+            return u;
+        if (x > u->data)
+            return search(u->right, x);
+        return search(u->left, x);
+    }
+
+    node<T> *remove(node<T> *u, T x) {
+        if (u == nullptr)
+            return nullptr;
+        if (x > u->data) {
+            u->right = remove(u->right, x);
+        } else if (x < u->data) {
+            u->left = remove(u->left, x);
+        } else {
+            if (u->left == nullptr) {
+                node<T> *temp = u->right;
+                delete u;
+                return temp;
+            } else if (u->right == nullptr) {
+                node<T> *temp = u->left;
+                delete u;
+                return temp;
+            } else {
+                node<T> *mx = max(u->left);
+                u->data = mx->data;
+                u->left = remove(u->left, mx->data);
+            }
+        }
+        return u;
+    }
+
+    void print(node<T> *u) {
+        if (u == nullptr)
+            return;
+        cout << u->data << " ";
+        print(u->left);
+        print(u->right);
+    }
+
+public:
+
+
+    void insert(T x) {
         root = insert(root, x);
         len++;
     }
 
-    void Increasing(node *u) {
-        if (u == nullptr)
-            return;
-        Increasing(u->left);
-        cout << u->data << " ";
-        Increasing(u->right);
+
+    bool search(T x) {
+        return search(root, x);
     }
 
-    void Decreasing(node *u){
-        if(u== nullptr){
+
+    void remove(T x) {
+        if (empty())
             return;
-        }
-        Decreasing(u->right);
-        cout << u->data << " ";
-        Decreasing(u->left);
+        remove(root, x);
+        len--;
     }
-    void print(bool check) {
-        check ? Increasing(root) : Decreasing(root) ;
+
+    void print() {
+        print(root);
     }
 
     bool empty() {
@@ -62,12 +113,14 @@ public:
 };
 
 int main() {
-    BST v;
-    v.insert(6);
-    v.insert(3);
-    v.insert(7);
-    v.insert(1);
-    v.print(0);
+    BST<int> v;
+    for (int i = 0; i < 10; i++) {
+        int x;
+        cin >> x;
+        v.insert(x);
+    }
+    v.print();
     cout << "\n";
-    v.print(1);
+    v.remove(9);
+    v.print();
 }
