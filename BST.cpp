@@ -79,8 +79,6 @@ private:
     }
 
 public:
-
-
     void insert(T x) {
         root = insert(root, x);
         len++;
