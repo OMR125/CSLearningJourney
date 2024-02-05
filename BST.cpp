@@ -1,124 +1,86 @@
 #include <bits./stdc++.h>
-
 using namespace std;
-
-template<typename T>
+template <class T>
 struct node {
     T data;
-    node *left = nullptr;
-    node *right = nullptr;
-
-    node(T x) {
-        data = x;
-    }
+    node<T>* left = nullptr;
+    node<T>* right = nullptr;
+    node<T>(T _data) : data(_data){};
 };
-
-template<typename T>
+template <class T>
 class BST {
-private:
-    node<T> *root;
-    int len = 0;
-private:
-    node<T> *insert(node<T> *u, T x) {
-        if (u == nullptr || empty())
+   private:
+    node<T>* root = nullptr;
+
+   private:
+    node<T>* insert(node<T>* u, T x) {
+        if (u == nullptr || empty()) {
             u = new node<T>(x);
-        else if (x >= u->data)
+        } else if (x >= u->data) {
             u->right = insert(u->right, x);
-        else
+        } else {
             u->left = insert(u->left, x);
+        }
         return u;
     }
-
-    node<T> *max(node<T> *u) {
-        if (u->right == nullptr)
-            return u;
-        max(u->right);
-    }
-
-    node<T> *search(node<T> *u, T x) {
-        if (u == nullptr)
-            return nullptr;
-        if (x == u->data)
-            return u;
+    node<T>* remove(node<T>* u, T x) {
+        if (u == nullptr) return nullptr;
         if (x > u->data)
-            return search(u->right, x);
-        return search(u->left, x);
-    }
-
-    node<T> *remove(node<T> *u, T x) {
-        if (u == nullptr)
-            return nullptr;
-        if (x > u->data) {
             u->right = remove(u->right, x);
-        } else if (x < u->data) {
+        else if (x < u->data)
             u->left = remove(u->left, x);
-        } else {
-            if (u->left == nullptr) {
-                node<T> *temp = u->right;
+        else {
+            if (u->right == nullptr) {
+                node<T>* temp = u->left;
                 delete u;
                 return temp;
-            } else if (u->right == nullptr) {
-                node<T> *temp = u->left;
+            } else if (u->left == nullptr) {
+                node<T>* temp = u->right;
                 delete u;
                 return temp;
             } else {
-                node<T> *mx = max(u->left);
-                u->data = mx->data;
-                u->left = remove(u->left, mx->data);
+                u->data = max(u->left)->data;
+                u->left = remove(u->left, u->data);
             }
         }
         return u;
     }
-
-    void print(node<T> *u) {
-        if (u == nullptr)
-            return;
+    node<T>* search(node<T>* u, T x) {
+        if (x == u->data) return u;
+        if (u == nullptr) return nullptr;
+        if (x > u->data) return search(u->right, x);
+        return search(u->left, x);
+    }
+    node<T>* max(node<T>* u) {
+        if (u->right == nullptr) return u;
+        return max(u->right);
+    }
+    void preOrder(node<T>* u) {
+        if (u == nullptr) return;
         cout << u->data << " ";
-        print(u->left);
-        print(u->right);
+        preOrder(u->left);
+        preOrder(u->right);
+    }
+    void inOrder(node<T>* u) {
+        if (u == nullptr) return;
+        inOrder(u->left);
+        cout << u->data << " ";
+        inOrder(u->right);
+    }
+    void postOrder(node<T>* u) {
+        if (u == nullptr) return;
+        postOrder(u->right);
+        cout << u->data << " ";
+        postOrder(u->left);
     }
 
-public:
-    void insert(T x) {
-        root = insert(root, x);
-        len++;
-    }
-
-
-    bool search(T x) {
-        return search(root, x);
-    }
-
-
-    void remove(T x) {
-        if (empty())
-            return;
-        remove(root, x);
-        len--;
-    }
-
-    void print() {
-        print(root);
-    }
-
-    bool empty() {
-        return !len;
-    }
-
-    int size() {
-        return len;
-    }
+   public:
+    bool empty() { return root == nullptr; }
+    void insert(T x) { root = insert(root, x); }
+    void remove(T x) { remove(root, x); }
+    bool search(T x) { return search(root, x); }
+    void preOrder() { preOrder(root); }
 };
-
 int main() {
-    BST<int> v;
-    for (int i = 0; i < 10; i++) {
-        int x;
-        cin >> x;
-        v.insert(x);
-    }
-    v.print();
-    cout << "\n";
-    v.remove(9);
-    v.print();
+  
 }
