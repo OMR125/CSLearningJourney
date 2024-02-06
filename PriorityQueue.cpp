@@ -11,26 +11,26 @@ template <typename T, typename Compare = less<T>>
 class PQ {
    private:
     int len = 0;
-    vector<T> v;
+    vector<T> heap;
 
    private:
-    void go_up(int child) {
+    void BubbleUp(int child) {
         int parent = (child - 1) / 2;
-        while (Compare()(v[child], v[parent])) {
-            swap(v[parent], v[child]);
+        while (Compare()(heap[child], heap[parent])) {
+            swap(heap[parent], heap[child]);
             child = parent;
             parent = (child - 1) / 2;
         }
     }
-    void go_down(int parent) {
+    void BubbleDown(int parent) {
         int left = 2 * parent + 1;
         int right = 2 * parent + 2;
         while (true) {
             int child;
             if (left >= len) break;
-            if (!Compare()(v[parent], v[left]) || !Compare()(v[parent], v[right])) {
-                child = !Compare()(v[right], v[left]) ? left : right;
-                swap(v[parent], v[child]);
+            if (!Compare()(heap[parent], heap[left]) || !Compare()(heap[parent], heap[right])) {
+                child = !Compare()(heap[right], heap[left]) ? left : right;
+                swap(heap[parent], heap[child]);
             } else
                 break;
             parent = child;
@@ -46,22 +46,23 @@ class PQ {
         if (len + 1 > MAXSIZE) {
             throw length_error("Size is too large");
         }
-        v.push_back(x);
-        go_up(len);
+        heap.push_back(x);
+        BubbleUp(len);
         len++;
     }
     void pop() {
-        v[0] = v[len - 1];
-        v.pop_back();
+        heap[0] = heap[len - 1];
+        heap.pop_back();
         len--;
-        go_down(0);
+        BubbleDown(0);
     }
-    T top() { return v[0]; }
-    void remove(T x) { // useless function you won't need this in a priority queue goes to O(N)
-        int i = find(v.begin(), v.end(), x) - v.begin();
-        v[i] = v[len - 1];
-        v.pop_back();
-        go_down(i);
+    T top() { return heap[0]; }
+    void remove(T x) {  // useless function you won't need this in a priority
+                        // queue goes to O(N)
+        int i = find(heap.begin(), heap.end(), x) - heap.begin();
+        heap[i] = heap[len - 1];
+        heap.pop_back();
+        BubbleDown(i);
     }
     void clear() {
         while (!empty()) {
@@ -71,7 +72,7 @@ class PQ {
 };
 
 int main() {
-    PQ<int, greater<>> x;
+    PQ<int, less<>> x;
     x.push(2);
     x.push(3);
     x.push(1);
