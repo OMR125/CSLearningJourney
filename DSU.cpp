@@ -36,10 +36,10 @@ class DSU {
         x = Find(x);
         y = Find(y);
         if (x == y) return;
-        if (sz[x] >= sz[y])
-            parent[y] = x, sz[x] += sz[y];
-        else
-            parent[x] = y, sz[y] += sz[x];
+        if (sz[x] < sz[y])
+            swap(x, y);
+        parent[y] = x;
+        sz[x] += sz[y];
         sets--;
     }
     int NumOfComponents() { return sets; }
