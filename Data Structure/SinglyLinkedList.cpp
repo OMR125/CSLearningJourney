@@ -6,6 +6,7 @@ struct Node {
     std::shared_ptr<Node<T>> next = nullptr;
 
     Node(T _data) : data(_data) {}
+
 };
 
 template <typename T>
