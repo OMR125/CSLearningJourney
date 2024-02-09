@@ -17,6 +17,7 @@ class Stack {
 private:
     node<T> *head;
     int len = 0;
+
 public:
     void push(T x) {
         len++;
