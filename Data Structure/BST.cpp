@@ -7,6 +7,7 @@ struct node {
     node<T>* right = nullptr;
     node<T>(T _data) : data(_data){};
 };
+
 template <class T>
 class BST {
    private:
