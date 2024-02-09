@@ -18,19 +18,10 @@ class DSU {
         if (parent[x] == x) return x;
         return parent[x] = Find(parent[x]); */
 
-        // iterative method avoid the Stack Overflow problem but is slightly
-        // more complex and longer than the recursive version, but it handles
+        // iterative method avoids the Stack Overflow problem and it handles
         // larger data sets and deeper trees better.
-        int root = x;
-        while (root != parent[root]) {
-            root = parent[root];
-        }
-        while (x != root) {
-            int realParent = parent[x];
-            parent[x] = root;
-            x = realParent;
-        }
-        return root;
+        while (x != parent[x]) x = parent[x] = parent[parent[x]];
+        return x;
     }
     void Union(int x, int y) {
         x = Find(x);
