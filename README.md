@@ -1,4 +1,4 @@
-# Data Structures Learning Journey :books:
+# A Computer Science Student's Learning Journey :books:
 
 Hello! :wave: This is my repository for documenting my growth in understanding and mastering data structures. 
 
