@@ -1,98 +1,102 @@
-#include <bits./stdc++.h>
+#include <bits/stdc++.h>
 
-using namespace std;
-struct node {
-    int data;
-    node* next = nullptr;
-    node(int _data) { data = _data; }
+template <typename T>
+struct Node {
+    T data;
+    std::shared_ptr<Node<T>> next = nullptr;
+
+    Node(T _data) : data(_data) {}
 };
 
+template <typename T>
 class LinkedList {
    private:
-    node* head = nullptr;
+    std::shared_ptr<Node<T>> head = nullptr;
     int sz = 0;
 
    public:
-    void push_front(int x) {
+    void push_front(T x) {
         sz++;
-
-        node* add = new node(x);
+        auto add = std::make_shared<Node<T>>(x);
         if (!empty()) add->next = head;
         head = add;
     }
-    void push_back(int x) {  // complexity fixed in Doubly Linked List
+
+    void push_back(T x) {
         sz++;
-        node* add = new node(x);
+        auto add = std::make_shared<Node<T>>(x);
         if (empty()) {
             head = add;
             return;
         }
-        node* temp = head;
+        auto temp = head;
         while (temp->next != nullptr) temp = temp->next;
         temp->next = add;
     }
-    void insert(int x,
-                int idx) {  // complexity slightly fixed in Doubly Linked List
-        if (idx >= sz) throw out_of_range("Index bigger than the Linked List!");
+
+    void insert(T x, int idx) {
+        if (idx >= sz)
+            throw std::out_of_range("Index bigger than the Linked List!");
+        auto add = std::make_shared<Node<T>>(x);
         sz++;
-        node* add = new node(x);
         if (empty()) {
             head = add;
             return;
         }
-        node* temp = head;
+        auto temp = head;
         while (--idx) temp = temp->next;
         add->next = temp->next;
         temp->next = add;
     }
+
     void pop_front() {
-        if (empty()) throw out_of_range("Linked List is Empty!");
-        sz--;
-        node* temp = head;
+        if (empty()) throw std::out_of_range("Linked List is Empty!");
         head = head->next;
-        delete temp;
-    }
-    void pop_back() {  // complexity fixed in Doubly Linked List
-        if (empty()) throw out_of_range("Linked List is empty!");
-        if (sz == 1) pop_front();
-        node* temp = head;
-        int idx = sz - 1;
-        while (--idx) temp = temp->next;
-        node* del = temp->next;
-        temp->next = nullptr;
-        delete del;
         sz--;
     }
-    void erase(int x) {
-        if (empty()) throw out_of_range("Linked List is empty!");
+
+    void pop_back() {
+        if (empty()) throw std::out_of_range("Linked List is empty!");
+        if (sz == 1) {
+            pop_front();
+            return;
+        }
+        auto temp = head;
+        while (temp->next->next != nullptr) temp = temp->next;
+        temp->next = nullptr;
+        sz--;
+    }
+
+    void erase(T x) {
+        if (empty()) throw std::out_of_range("Linked List is empty!");
         if (head->data == x) {
             pop_front();
             return;
         }
-        node* temp = head;
-        while (temp != nullptr && temp->next->data != x) {
+        auto temp = head;
+        while (temp->next != nullptr && temp->next->data != x) {
             temp = temp->next;
         }
-        if (temp == nullptr) return;
-        node* del = temp->next;
-        temp->next = del->next;
-        delete del;
+        if (temp->next == nullptr) return;
+        temp->next = temp->next->next;
         sz--;
     }
 
-    void print() {
-        node* temp = head;
+    void print() const {
+        auto temp = head;
         while (temp != nullptr) {
-            cout << temp->data << " ";
+            std::cout << temp->data << " ";
             temp = temp->next;
         }
-        cout << "\n";
+        std::cout << "\n";
     }
-    bool empty() { return head == nullptr; }
-    bool size() { return sz; }
+
+    bool empty() const { return head == nullptr; }
+    int size() const { return sz; }
 };
+
 int main() {
-    LinkedList s;
+    LinkedList<int> s;
     // 9 8 6 3 10 1 11 2 4 7
     s.push_back(1);
     s.push_back(2);
@@ -111,4 +115,5 @@ int main() {
     s.print();
     s.erase(9);
     s.print();
+    std::cout << s.size() << "\n";
 }
