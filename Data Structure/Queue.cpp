@@ -19,6 +19,7 @@ private:
     node<T> *head;
     node<T> *tail;
     int len = 0;
+
 public:
     void push(T x) {
         node<T> *new_data = new node(x);
