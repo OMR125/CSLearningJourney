@@ -13,8 +13,3 @@ For now, my primary focus is on data structures. I will be updating this reposit
 ## Future Plans :rocket:
 
 In the future, I might expand this repository to document my broader journey in learning Computer Science. But let's just start with data structures for now!
-
-## Stay Tuned :bell:
-
-Stay tuned for updates and feel free to share any resources or feedback that you think might help me on this journey. Happy learning! :smile:
-
