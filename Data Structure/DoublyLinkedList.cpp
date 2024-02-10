@@ -1,49 +1,56 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <memory>
 
-using namespace std;
-
-struct node {
-    int data;
-    shared_ptr<node> next = nullptr;
-    shared_ptr<node> prev = nullptr;
-    node(int _data) : data(_data){};
-    node(int _data, shared_ptr<node>& _prev, shared_ptr<node>& _next) {
+template <typename T>
+struct Node {
+    T data;
+    std::shared_ptr<Node<T>> next = nullptr;
+    std::shared_ptr<Node<T>> prev = nullptr;
+    Node(T _data) : data(_data){};
+    Node(T _data, std::shared_ptr<Node<T>>& _prev,
+         std::shared_ptr<Node<T>>& _next) {
         data = _data;
         prev = _prev;
         next = _next;
     }
 };
 
+template <typename T>
 class LinkedList {
    private:
-    shared_ptr<node> head = nullptr;
-    shared_ptr<node> tail = nullptr;
-    int sz = 0;
+    std::shared_ptr<Node<T>> head = nullptr;
+    std::shared_ptr<Node<T>> tail = nullptr;
+    int size = 0;
 
    private:
-    void erasenode(shared_ptr<node>& del) {
-        if (del->prev != nullptr)
-            del->prev->next = del->next;
+    std::shared_ptr<Node<T>> createNode(T nodeValue) {
+        size++;
+        return std::make_shared<Node<T>>(nodeValue);
+    }
+
+    void eraseNode(std::shared_ptr<Node<T>>& deleteNode) {
+        if (deleteNode->prev != nullptr)
+            deleteNode->prev->next = deleteNode->next;
         else
             head = head->next;
 
-        if (del->next != nullptr)
-            del->next->prev = del->prev;
+        if (deleteNode->next != nullptr)
+            deleteNode->next->prev = deleteNode->prev;
         else
             tail = tail->prev;
-        sz--;
+        size--;
     }
-    void insertbefore(int x, shared_ptr<node>& u) {
-        auto add = make_shared<node>(x, u->prev, u);
+
+    void insertBefore(T nodeValue, std::shared_ptr<Node<T>>& u) {
+        auto add = std::make_shared<Node<T>>(nodeValue, u->prev, u);
         u->prev->next = add;
         u->prev = add;
-        sz++;
+        size++;
     }
 
    public:
-    void push_back(int x) {
-        sz++;
-        auto add = make_shared<node>(x);
+    void push_back(T nodeValue) {
+        auto add = createNode(nodeValue);
         if (empty()) {
             head = add;
             tail = add;
@@ -53,9 +60,9 @@ class LinkedList {
         }
         tail = add;
     }
-    void push_front(int x) {
-        sz++;
-        auto add = make_shared<node>(x);
+
+    void push_front(T nodeValue) {
+        auto add = createNode(nodeValue);
         if (empty()) {
             head = add;
             tail = add;
@@ -65,93 +72,110 @@ class LinkedList {
         }
         head = add;
     }
+
     void pop_back() {
-        if (empty()) throw out_of_range("Linked List is Empty!");
+        if (empty()) throw std::out_of_range("Linked List is Empty!");
         tail = tail->prev;
         tail->next = nullptr;
-        sz--;
+        size--;
     }
+
     void pop_front() {
-        if (empty()) throw out_of_range("Linked List is Empty!");
+        if (empty()) throw std::out_of_range("Linked List is Empty!");
         head = head->next;
         head->prev = nullptr;
-        sz--;
+        size--;
     }
-    void eraseFirstOccurrence(int x) {
-        auto temp = head;
-        while (temp != nullptr) {
-            if (temp->data == x) erasenode(temp);
-            temp = temp->next;
-        }
-    }
-    void eraseLastOccurrence(int x) {
-        auto temp = tail;
-        while (temp != nullptr) {
-            if (temp->data == x) erasenode(temp);
-            temp = temp->prev;
+
+    void eraseFirstOccurrence(T nodeValue) {
+        auto iterNode = head;
+        while (iterNode != nullptr) {
+            if (iterNode->data == nodeValue) {
+                eraseNode(iterNode);
+                break;
+            }
+            iterNode = iterNode->next;
         }
     }
 
-    void erase(int x) {
-        auto l = head;
-        auto r = tail;
-        int cnt = (sz + 1) / 2;
+    void eraseLastOccurrence(T nodeValue) {
+        auto iterNode = tail;
+        while (iterNode != nullptr) {
+            if (iterNode->data == nodeValue) {
+                eraseNode(iterNode);
+                break;
+            }
+            iterNode = iterNode->prev;
+        }
+    }
+
+    void erase(T nodeValue) {
+        auto left = head;
+        auto right = tail;
+        int cnt = (size + 1) / 2;
         while (cnt--) {
-            auto next_l = l->next;
-            auto prev_r = r->prev;
-            if (l->data == x) erasenode(l);
-            if (r->data == x) erasenode(r);
-            l = next_l;
-            r = prev_r;
+            auto next_l = left->next;
+            auto prev_r = right->prev;
+            if (left->data == nodeValue) {
+                eraseNode(left);
+            }
+            if (right != left && right->data == nodeValue) {
+                eraseNode(right);
+            }
+            left = next_l;
+            right = prev_r;
         }
     }
 
-    void insert(int x, int idx) {
-        if (idx > sz)
-            throw out_of_range(
-                "Index Bigger Than The Size of The Linked List!");
-        if (idx == sz) push_back(x);
-        if (idx == 0) push_front(x);
-        shared_ptr<node> temp;
-        if (idx < sz / 2) {
-            temp = head;
-            while (idx--) {
-                temp = temp->next;
-            }
+    void insert(T nodeValue, int index) {
+        if (index > size || index < 0)
+            throw std::out_of_range("Index isn't Valid");
+        if (index == size) push_back(nodeValue);
+        if (index == 0) push_front(nodeValue);
+        std::shared_ptr<Node<T>> iterNode;
+        if (index < size / 2) {
+            iterNode = head;
+            while (index--) iterNode = iterNode->next;
         } else {
-            idx = sz - idx - 1;
-            temp = tail;
-            while (idx--) {
-                temp = temp->prev;
-            }
+            index = size - index - 1;
+            iterNode = tail;
+            while (index--) iterNode = iterNode->prev;
         }
-        insertbefore(x, temp);
+        insertBefore(nodeValue, iterNode);
     }
-    bool empty() { return head == nullptr; }
-    int size() { return sz; }
-    void print() {
+
+    bool empty() const { return head == nullptr; }
+
+    int getSize() const { return size; }
+
+    void print() const {
         if (empty()) {
-            cout << "The Linked List is Empty :)";
+            std::cout << "The Linked List is Empty :)";
             return;
         }
-        auto temp = head;
-        while (temp != nullptr) {
-            cout << temp->data << " ";
-            temp = temp->next;
+        auto iterNode = head;
+        while (iterNode != nullptr) {
+            std::cout << iterNode->data << " ";
+            iterNode = iterNode->next;
         }
-        cout << "\n";
+        std::cout << "\n";
     }
 };
 
 int main() {
-    LinkedList s;
+    LinkedList<int> s;
+
     s.push_front(4);
     s.push_front(4);
     s.push_front(4);
     s.push_front(4);
+    s.push_front(4);
+    s.push_back(1);
+    s.push_back(2);
+    s.push_back(3);
     s.push_back(4);
-    s.push_back(4);
-    s.erase(2);
+
+    s.print();
     s.erase(4);
     s.print();
 }
