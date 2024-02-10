@@ -1,71 +1,69 @@
-#include <bits./stdc++.h>
+#include <iostream>
+#include <list>
 
-using namespace std;
-
+template <typename K, typename V>
 class HashMap {
    private:
-    static const int MAXSIZE = 5;
-    list<pair<int, int>> table[MAXSIZE];
+    static const int MAXSIZE = 20;
+    std::list<std::pair<K, V>> table[MAXSIZE];
     int size = 0;
 
    public:
-    int hash(int key) { return key % MAXSIZE; }
-    bool empty() { return !size; }
-    bool getSize() { return size; }
-    void insert(int key, int value) {
-        int hashValue = hash(key);
+    int hashFunction(K key) const {  // can be better of course
+        return key % MAXSIZE;
+    }
+    bool empty() const { return !size; }
+    int getSize() const { return size; }
+    void insert(K key, V value) {
+        int hashValue = hashFunction(key);
         auto &cell = table[hashValue];
-        bool found = 0;
-        for (auto &e : cell) {
-            if (e.first == key) {
-                found = 1;
-                e.second = value;
-                break;
+        for (auto &entry : cell) {
+            if (entry.first == key) {
+                entry.second = value;
+                return;
             }
         }
-        if (!found) cell.push_back({key, value}), size++;
+        cell.emplace_back(key, value);
+        size++;
     }
-    void erase(int key) {
-        int hashValue = hash(key);
+    void erase(K key) {
+        int hashValue = hashFunction(key);
         auto &cell = table[hashValue];
+        for (auto it = cell.begin(); it != cell.end(); ++it)
+            if (it->first == key) {
+                cell.erase(it);
+                size--;
+                return;
+            }
 
-        auto it = cell.begin();
-        bool found = 0;
-        for (const auto &e : cell) {
-            if (e.first == key) {
-                found = 1;
-                it = cell.erase(it), size--;
-                break;
-            }
-            it++;
-        }
-        if (!found) cout << "Key doesn't exist!\n";
+        std::cout << "Key doesn't exist!\n";
     }
-    int getValue(int key) {
-        int hashValue = hash(key);
-        for (const auto &e : table[hashValue]) {
-            if (e.first == key) {
-                return e.second;
-            }
-        }
-        return 0;
+    V getValue(K key) const {
+        int hashValue = hashFunction(key);
+        for (const auto &e : table[hashValue])
+            if (e.first == key) return e.second;
+
+        throw std::runtime_error("Key not found");
     }
-    void print() {
+    void print() const {
         for (int i = 0; i < MAXSIZE; i++)
             for (const auto &e : table[i])
-                cout << e.first << " " << e.second << "\n";
+                std::cout << e.first << " " << e.second << "\n";
     }
-    int operator[](int key) { return getValue(key); }
+    V operator[](K key) const { return getValue(key); }
 };
+
 int main() {
-    HashMap mp;
+    HashMap<int, int> mp;
     mp.insert(1, 2);
     mp.insert(2, 3);
     mp.insert(5, 3);
     mp.insert(7, 8);
     mp.insert(12, 9);
     mp.insert(7, 3);
+    std::cout << mp.getSize() << "\n";
+    mp.print();
     mp.erase(7);
+    std::cout << mp.getSize() << "\n";
     mp.print();
 }
-
