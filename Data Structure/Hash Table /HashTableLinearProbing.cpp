@@ -35,7 +35,7 @@ class HashTable {
     int size() const;
 };
 
-HashTable::HashTable(float loadFactor) : maxLoadFactor(loadFactor) {
+HashTable::HashTable(float loadFactor) : maxLoadFactor(min((float)1,loadFactor)) {
     hashTable.resize(tableSize);
     entryState.resize(tableSize);
 }
