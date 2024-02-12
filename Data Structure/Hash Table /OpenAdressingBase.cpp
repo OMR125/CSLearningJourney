@@ -8,7 +8,6 @@ enum EntryState { ALIVE, USED, DEAD };
 
 class HashTable {
    protected:
-    const int LinearProbingConstant = 83;
     float maxLoadFactor;
     int totalEntries = 0;
     int tableSize = 1;
