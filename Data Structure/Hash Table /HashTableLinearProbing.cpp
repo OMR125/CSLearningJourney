@@ -1,13 +1,15 @@
-#include "HashTable.cpp"
 #include <algorithm>
+#include "HashTable.cpp"
+
 class LinearProbing : public HashTable {
    private:
+    const int LinearProbingConstant = 83;
     int hashFunction(int key) const;
     int probingFunction(int x) const;
     int properSize(int x) const;
 
    public:
-   int x(){return tableSize;}
+    int x() { return tableSize; }
     LinearProbing() : HashTable(){};
     LinearProbing(float LoadFactor) : HashTable(LoadFactor){};
 };
@@ -26,12 +28,11 @@ int main() {
     x.insert(1, 2);
     x.insert(2, 3);
     x.insert(5, 4);
-    x.insert(821,9);
-    x.insert(24,9);
-    x.insert(24241,3);
-    x.insert(-1324,2);    
-    x.insert(7654,11);    
+    x.insert(821, 9);
+    x.insert(24, 9);
+    x.insert(24241, 3);
+    x.insert(-1324, 2);
+    x.insert(7654, 11);
     x.erase(5);
     x.print();
-   
 }
