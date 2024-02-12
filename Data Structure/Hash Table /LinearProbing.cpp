@@ -9,7 +9,6 @@ class LinearProbing : public HashTable {
     int properSize(int x) const;
 
    public:
-    int x() { return tableSize; }
     LinearProbing() : HashTable(){};
     LinearProbing(float LoadFactor) : HashTable(LoadFactor){};
 };
