@@ -81,8 +81,7 @@ void HashTable::insert(int key, int value) {
          hashValue = (hashValue * probingFunction(x++)) % tableSize) {
         if (entryState[hashValue] == DEAD && emptySlot == -1) {
             emptySlot = hashValue;
-        } else if (hashTable[hashValue].first == key ||
-                   entryState[hashValue] == ALIVE) {
+        } else if (hashTable[hashValue].first == key || entryState[hashValue] == ALIVE) {
             if (hashTable[hashValue].first == key) {
                 totalEntries--;
             }
@@ -125,8 +124,7 @@ int HashTable::getValue(int key) {
          hashValue = (hashValue * probingFunction(x++)) % tableSize) {
         if (entryState[hashValue] == DEAD && emptySlot == -1) {
             emptySlot = hashValue;
-        } else if (entryState[hashValue] == USED &&
-                   hashTable[hashValue].first == key) {
+        } else if (entryState[hashValue] == USED && hashTable[hashValue].first == key) {
             if (~emptySlot) {
                 entryState[hashValue] = ALIVE;
                 hashTable[emptySlot] = hashTable[hashValue];
