@@ -1,162 +1,37 @@
-#include <bits/stdc++.h>
-using namespace std;
-
-enum EntryState { ALIVE, USED, DEAD };
-
-class HashTable {
+#include "HashTable.cpp"
+#include <algorithm>
+class LinearProbing : public HashTable {
    private:
-    const int LinearProbingConstant = 83;
-    float maxLoadFactor;
-    int totalEntries = 0;
-    int tableSize = 1;
-    vector<pair<int, int>> hashTable;
-    vector<int> entryState;
-
-    int hashFunction(int key) const { return key % tableSize; }
-
-    int probingFunction(int x) const {
-        return (LinearProbingConstant * x) % tableSize;
-    }
-
-    int loadThreshold() const { return maxLoadFactor * tableSize; }
-
-    bool needsResizing() const { return totalEntries >= loadThreshold(); }
-
-    void adjustTableSize();
+    int hashFunction(int key) const;
+    int probingFunction(int x) const;
+    int properSize(int x) const;
 
    public:
-    HashTable(float loadFactor);
-    HashTable();
-    void insert(int key, int value);
-    void erase(int key);
-    int getValue(int key);
-    int operator[](int key);
-    void print() const;
-    int size() const;
+   int x(){return tableSize;}
+    LinearProbing() : HashTable(){};
+    LinearProbing(float LoadFactor) : HashTable(LoadFactor){};
 };
-
-HashTable::HashTable(float loadFactor) : maxLoadFactor(min((float)1,loadFactor)) {
-    hashTable.resize(tableSize);
-    entryState.resize(tableSize);
+int LinearProbing::hashFunction(int key) const { return key % tableSize; }
+int LinearProbing::probingFunction(int x) const {
+    return (LinearProbingConstant * x) % tableSize;
 }
-
-HashTable::HashTable() : maxLoadFactor(0.75) {
-    hashTable.resize(tableSize);
-    entryState.resize(tableSize);
-}
-
-void HashTable::adjustTableSize() {
-    totalEntries = 0;
-    tableSize *= 2;
+int LinearProbing::properSize(int x) const {
     while (__gcd(tableSize, LinearProbingConstant) != 1) {
-        tableSize++;
+        x++;
     }
-
-    vector<pair<int, int>> oldTable(hashTable.begin(), hashTable.end());
-    vector<int> oldEntryState(entryState.begin(), entryState.end());
-
-    hashTable.clear();
-    hashTable.resize(tableSize);
-    entryState.clear();
-    entryState.resize(tableSize);
-
-    for (int i = 0; i < oldTable.size(); i++) {
-        if (oldEntryState[i] == USED) {
-            insert(oldTable[i].first, oldTable[i].second);
-        }
-    }
+    return x;
 }
-
-void HashTable::insert(int key, int value) {
-    if (needsResizing()) {
-        adjustTableSize();
-    }
-
-    int hashValue = abs(hashFunction(key)) % tableSize;
-    bool isInserted = false;
-
-    for (int x = 1, emptySlot = -1; !isInserted;
-         hashValue = (hashValue * probingFunction(x++)) % tableSize) {
-        if (entryState[hashValue] == DEAD && emptySlot == -1) {
-            emptySlot = hashValue;
-        } else if (hashTable[hashValue].first == key || entryState[hashValue] == ALIVE) {
-            if (hashTable[hashValue].first == key) {
-                totalEntries--;
-            }
-            if (~emptySlot) {
-                entryState[hashValue] = ALIVE;
-                hashValue = emptySlot;
-            }
-            entryState[hashValue] = USED;
-            hashTable[hashValue] = {key, value};
-            isInserted = true;
-        }
-    }
-    totalEntries++;
-}
-
-void HashTable::erase(int key) {
-    int hashValue = abs(hashFunction(key)) % tableSize;
-
-    for (int x = 1;;
-         hashValue = (hashValue * probingFunction(x++)) % tableSize) {
-        if (entryState[hashValue] == DEAD) {
-            continue;
-        }
-        if (entryState[hashValue] == ALIVE) {
-            break;
-        }
-        if (hashTable[hashValue].first == key) {
-            totalEntries--;
-            entryState[hashValue] = DEAD;
-            break;
-        }
-    }
-}
-
-int HashTable::getValue(int key) {
-    int hashValue = abs(hashFunction(key)) % tableSize;
-    bool isFound = false;
-
-    for (int x = 1, emptySlot = -1;;
-         hashValue = (hashValue * probingFunction(x++)) % tableSize) {
-        if (entryState[hashValue] == DEAD && emptySlot == -1) {
-            emptySlot = hashValue;
-        } else if (entryState[hashValue] == USED && hashTable[hashValue].first == key) {
-            if (~emptySlot) {
-                entryState[hashValue] = ALIVE;
-                hashTable[emptySlot] = hashTable[hashValue];
-                hashValue = emptySlot;
-            }
-            entryState[hashValue] = USED;
-            return hashTable[hashValue].second;
-        } else if (entryState[hashValue] == ALIVE) {
-            return 0;
-        }
-    }
-}
-
-int HashTable::operator[](int key) { return getValue(key); }
-
-void HashTable::print() const {
-    for (int i = 0; i < tableSize; i++) {
-        if (entryState[i] == USED) {
-            cout << hashTable[i].first << " " << hashTable[i].second << "\n";
-        }
-    }
-}
-
-int HashTable::size() const { return totalEntries; }
-
 int main() {
-    HashTable x;
-    x.insert(19, 11);
+    LinearProbing x(0.44);
     x.insert(1, 2);
-    x.insert(3, 7);
-    x.insert(2, 4);
-    x.insert(12, 9);
-    x.insert(8, 3);
-    x.insert(41, -2);
-    x.insert(-821, -32);
+    x.insert(2, 3);
+    x.insert(5, 4);
+    x.insert(821,9);
+    x.insert(24,9);
+    x.insert(24241,3);
+    x.insert(-1324,2);    
+    x.insert(7654,11);    
+    x.erase(5);
     x.print();
+   
 }
