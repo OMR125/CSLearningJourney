@@ -1,111 +1,153 @@
-#include <bits./stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 
-// to make Linear Probing stop cycle and effecient. GCD(a,N) = 1 . N is the size
-// of the hash table. for Quadratic probing there's a lot of possible functions
-// for P(x) but here i'll use P(x) = (x^2+x)/2 and N must be a power of two .
-// there exists a max load factor as will which when multiplied by the size it
-// produced a variable which is our key to resize the table when we cycle more
-// than it. we resize the table to 2N when we cycle through the hash table more
-// than or equal (max load factor * N) . max load factor is less than one.
-// double hashing is another way that i will cover next
-enum State { ALIVE, USED, DEAD };
+enum EntryState { ALIVE, USED, DEAD };
+
 class HashTable {
    private:
-    const int LinearConstant = 1;
-    float loadFactor;
-    int elements = 0, size = 1;
-    vector<pair<int, int>> v;
-    vector<int> flag;
+    const int LinearProbingConstant = 83;
+    float maxLoadFactor;
+    int totalEntries = 0;
+    int tableSize = 1;
+    vector<pair<int, int>> hashTable;
+    vector<int> entryState;
 
-   private:
-    void adjustSize() {
-        elements = 0;
-        size *= 2;
-        while (__gcd(size, LinearConstant) != 1) size++;
-        vector<pair<int, int>> oldTable(v.begin(), v.end());
-        vector<int> oldflag(flag.begin(), flag.end());
-        v.clear(), v.resize(size);
-        flag.clear(), flag.resize(size);
-        for (int i = 0; i < oldTable.size(); i++)
-            if (oldflag[i] == USED)
-                insert(oldTable[i].first, oldTable[i].second);
+    int hashFunction(int key) const { return key % tableSize; }
+
+    int probingFunction(int x) const {
+        return (LinearProbingConstant * x) % tableSize;
     }
-    bool reSize() { return elements >= Threshold(); }
-    int getTableSize() { return size; }
-    int Threshold() { return loadFactor * size; }
+
+    int loadThreshold() const { return maxLoadFactor * tableSize; }
+
+    bool needsResizing() const { return totalEntries >= loadThreshold(); }
+
+    void adjustTableSize();
 
    public:
-    HashTable(float _x) : loadFactor(_x) {
-        v.resize(size);
-        flag.resize(size);
-    };
-    HashTable() : loadFactor(0.75) {
-        v.resize(size);
-        flag.resize(size);
-    };
-    int H(int key) { return key % size; }
-    int P(int x) { return LinearConstant * x % size; }
-    void insert(int key, int value) {
-        if (reSize()) adjustSize();
-
-        int hash = abs(H(key)) % size;
-        bool found = 0;
-        for (int x = 1, j = -1; !found; hash = (hash * P(x++)) % size) {
-            if (flag[hash] == DEAD && j == -1)
-                j = hash;
-            else if (v[hash].first == key || flag[hash] == ALIVE) {
-                if (v[hash].first == key) elements--;
-                if (~j) {
-                    flag[hash] = ALIVE;
-                    hash = j;
-                }
-                flag[hash] = USED;
-                v[hash] = {key, value}, found = 1;
-            }
-        }
-        elements++;
-    }
-    void erase(int key) {
-        int hash = abs(H(key)) % size;
-        for (int x = 1;; hash = (hash * P(x++)) % size) {
-            if (flag[hash] == DEAD) continue;
-            if (flag[hash] == ALIVE) break;
-            if (v[hash].first == key) {
-                elements--;
-                flag[hash] = DEAD;
-                break;
-            }
-        }
-    }
-    int getvalue(int key) {
-        int hash = abs(H(key)) % size;
-        bool found = 0;
-        for (int x = 1, j = -1;; hash = (hash * P(x++)) % size) {
-            if (flag[hash] == DEAD && j == -1)
-                j = hash;
-            else if (flag[hash] == USED && v[hash].first == key) {
-                if (~j) {
-                    flag[hash] = ALIVE;
-                    v[j] = v[hash];
-                    hash = j;
-                }
-                flag[hash] = USED;
-                return v[hash].second;
-            } else if (flag[hash] == ALIVE) {
-                return 0;
-            }
-        }
-    }
-    int operator[](int key) { return getvalue(key); }
-    void print() {
-        for (int i = 0; i < size; i++) {
-            if (flag[i] == USED)
-                cout << v[i].first << " " << v[i].second << "\n";
-        }
-    }
-    int getSize() { return elements; }
+    HashTable(float loadFactor);
+    HashTable();
+    void insert(int key, int value);
+    void erase(int key);
+    int getValue(int key);
+    int operator[](int key);
+    void print() const;
+    int size() const;
 };
+
+HashTable::HashTable(float loadFactor) : maxLoadFactor(loadFactor) {
+    hashTable.resize(tableSize);
+    entryState.resize(tableSize);
+}
+
+HashTable::HashTable() : maxLoadFactor(0.75) {
+    hashTable.resize(tableSize);
+    entryState.resize(tableSize);
+}
+
+void HashTable::adjustTableSize() {
+    totalEntries = 0;
+    tableSize *= 2;
+    while (__gcd(tableSize, LinearProbingConstant) != 1) {
+        tableSize++;
+    }
+
+    vector<pair<int, int>> oldTable(hashTable.begin(), hashTable.end());
+    vector<int> oldEntryState(entryState.begin(), entryState.end());
+
+    hashTable.clear();
+    hashTable.resize(tableSize);
+    entryState.clear();
+    entryState.resize(tableSize);
+
+    for (int i = 0; i < oldTable.size(); i++) {
+        if (oldEntryState[i] == USED) {
+            insert(oldTable[i].first, oldTable[i].second);
+        }
+    }
+}
+
+void HashTable::insert(int key, int value) {
+    if (needsResizing()) {
+        adjustTableSize();
+    }
+
+    int hashValue = abs(hashFunction(key)) % tableSize;
+    bool isInserted = false;
+
+    for (int x = 1, emptySlot = -1; !isInserted;
+         hashValue = (hashValue * probingFunction(x++)) % tableSize) {
+        if (entryState[hashValue] == DEAD && emptySlot == -1) {
+            emptySlot = hashValue;
+        } else if (hashTable[hashValue].first == key || entryState[hashValue] == ALIVE) {
+            if (hashTable[hashValue].first == key) {
+                totalEntries--;
+            }
+            if (~emptySlot) {
+                entryState[hashValue] = ALIVE;
+                hashValue = emptySlot;
+            }
+            entryState[hashValue] = USED;
+            hashTable[hashValue] = {key, value};
+            isInserted = true;
+        }
+    }
+    totalEntries++;
+}
+
+void HashTable::erase(int key) {
+    int hashValue = abs(hashFunction(key)) % tableSize;
+
+    for (int x = 1;;
+         hashValue = (hashValue * probingFunction(x++)) % tableSize) {
+        if (entryState[hashValue] == DEAD) {
+            continue;
+        }
+        if (entryState[hashValue] == ALIVE) {
+            break;
+        }
+        if (hashTable[hashValue].first == key) {
+            totalEntries--;
+            entryState[hashValue] = DEAD;
+            break;
+        }
+    }
+}
+
+int HashTable::getValue(int key) {
+    int hashValue = abs(hashFunction(key)) % tableSize;
+    bool isFound = false;
+
+    for (int x = 1, emptySlot = -1;;
+         hashValue = (hashValue * probingFunction(x++)) % tableSize) {
+        if (entryState[hashValue] == DEAD && emptySlot == -1) {
+            emptySlot = hashValue;
+        } else if (entryState[hashValue] == USED && hashTable[hashValue].first == key) {
+            if (~emptySlot) {
+                entryState[hashValue] = ALIVE;
+                hashTable[emptySlot] = hashTable[hashValue];
+                hashValue = emptySlot;
+            }
+            entryState[hashValue] = USED;
+            return hashTable[hashValue].second;
+        } else if (entryState[hashValue] == ALIVE) {
+            return 0;
+        }
+    }
+}
+
+int HashTable::operator[](int key) { return getValue(key); }
+
+void HashTable::print() const {
+    for (int i = 0; i < tableSize; i++) {
+        if (entryState[i] == USED) {
+            cout << hashTable[i].first << " " << hashTable[i].second << "\n";
+        }
+    }
+}
+
+int HashTable::size() const { return totalEntries; }
+
 int main() {
     HashTable x;
     x.insert(19, 11);
@@ -116,6 +158,5 @@ int main() {
     x.insert(8, 3);
     x.insert(41, -2);
     x.insert(-821, -32);
-    x.erase(-821);
     x.print();
 }
