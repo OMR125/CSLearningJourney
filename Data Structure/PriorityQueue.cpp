@@ -4,7 +4,7 @@ using namespace std;
 
 const int MAXSIZE = 1e5;
 // to get your parent index (i - 1) / 2
-// to get your left child index 2 *  i+ 1
+// to get your left child index 2 * i + 1
 // to get your parent index 2 * i + 2 == left + 1
 template <typename T, typename Compare = less<T>>
 class PQ {
