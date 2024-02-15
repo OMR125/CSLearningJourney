@@ -1,5 +1,6 @@
 #include <bits./stdc++.h>
 using namespace std;
+
 template <class T>
 struct node {
     T data;
