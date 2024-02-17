@@ -63,8 +63,12 @@ class AVLTree {
             currentNode->leftChild = removeNode(currentNode->leftChild, value);
         else {
             if (currentNode->rightChild == nullptr) {
+                tempNode = currentNode->leftChild;
+                delete currentNode;
                 return currentNode->leftChild;
             } else if (currentNode->leftChild == nullptr) {
+                tempNode = currentNode->rightChild;
+                delete currentNode;
                 return currentNode->rightChild;
             } else {
                 currentNode->value = findMaxNode(currentNode->leftChild)->value;
