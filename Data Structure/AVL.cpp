@@ -16,6 +16,7 @@ struct node {
 class AVL {
    private:
     node* root = nullptr;
+    int len = 0;
 
    private:
     node* insert(node* u, int data) {
@@ -105,12 +106,33 @@ class AVL {
         u->depth = 1 + max(op1, op2);
         u->bf = op2 - op1;
     }
+    void* inOrder(node* u) {
+        inOrder(u->left);
+        cout << u->data << "\n";
+        inOrder(u->right);
+    }
+    void* preOrder(node* u) {
+        cout << u->data << "\n";
+        preOrder(u->left);
+        preOrder(u->right);
+    }
+    void* postOrder(node* u) {
+        postOrder(u->right);
+        cout << u->data << "\n";
+        postOrder(u->left);
+    }
 
    public:
-    void insert(int data) { root = insert(root, data); };
+    bool insert(int data) {
+        if (search(data)) return false;
+        root = insert(root, data);
+        len++;
+        return true;
+    };
     void remove(int data) { root = remove(root, data); };
     bool search(int data) { return search(root, data); };
     bool empty() { return root == nullptr; };
+    int size() { return len; }
     int depth(int data) {
         node* distination = search(root, data);
         return distination != nullptr ? distination->depth - 1 : -1;
@@ -130,6 +152,11 @@ class AVL {
             cout << "\n";
         }
     }
+    int max_element() { return FindMax(root)->data; }
+    int min_element() { return FindMin(root)->data; }
+    void inOrder() { inOrder(root); }
+    void preOrder() { preOrder(root); }
+    void postOrder() { postOrder(root); }
 };
 int main() {
     AVL x;
