@@ -6,8 +6,8 @@ struct Node {
     int value;
     int balanceFactor = 0;
     int height = 1;
-    Node* leftChild = nullptr;
-    Node* rightChild = nullptr;
+    Node* left = nullptr;
+    Node* right = nullptr;
     Node(int _value) : value(_value){};
 };
 
@@ -17,122 +17,118 @@ class AVLTree {
     int treeSize = 0;
 
    private:
-    void updateNode(Node* currentNode) {
-        int rightChildHeight = currentNode->rightChild != nullptr ? currentNode->rightChild->height : 0;
-        int leftChildHeight = currentNode->leftChild != nullptr ? currentNode->leftChild->height : 0;
-        currentNode->height = 1 + max(rightChildHeight, leftChildHeight);
-        currentNode->balanceFactor = leftChildHeight - rightChildHeight;
+    void updateNode(Node* curNode) {
+        int rightHeight = curNode->right != nullptr ? curNode->right->height : 0;
+        int leftHeight = curNode->left != nullptr ? curNode->left->height : 0;
+        curNode->height = 1 + max(rightHeight, leftHeight);
+        curNode->balanceFactor = leftHeight - rightHeight;
     }
 
-    Node* balanceNode(Node* currentNode) {
-        if (currentNode->balanceFactor > 1) { // Left Heavy
-            if (currentNode->leftChild->balanceFactor >= 0) {
-                return rotateRight(currentNode); 
+    Node* balanceNode(Node* curNode) {
+        if (curNode->balanceFactor > 1) {  // Left Heavy
+            if (curNode->left->balanceFactor >= 0) {
+                return rotateRight(curNode);
             } else {
-                currentNode->leftChild = rotateLeft(currentNode->leftChild);
-                return rotateRight(currentNode);
+                curNode->left = rotateLeft(curNode->left);
+                return rotateRight(curNode);
             }
-        } else if (currentNode->balanceFactor < -1) { // Right Heavy
-            if (currentNode->rightChild->balanceFactor <= 0) {
-                return rotateLeft(currentNode);
+        } else if (curNode->balanceFactor < -1) {  // Right Heavy
+            if (curNode->right->balanceFactor <= 0) {
+                return rotateLeft(curNode);
             } else {
-                currentNode->rightChild = rotateRight(currentNode->rightChild);
-                return rotateLeft(currentNode);
+                curNode->right = rotateRight(curNode->right);
+                return rotateLeft(curNode);
             }
         }
-        return currentNode;
+        return curNode;
     }
 
-    Node* insertNode(Node* currentNode, int value) {
-        if (currentNode == nullptr) return new Node(value);
-        if (value > currentNode->value)
-            currentNode->rightChild =
-                insertNode(currentNode->rightChild, value);
+    Node* insertNode(Node* curNode, int value) {
+        if (curNode == nullptr) return new Node(value);
+        if (value > curNode->value)
+            curNode->right = insertNode(curNode->right, value);
         else
-            currentNode->leftChild = insertNode(currentNode->leftChild, value);
-        updateNode(currentNode);
-        return balanceNode(currentNode);
+            curNode->left = insertNode(curNode->left, value);
+        updateNode(curNode);
+        return balanceNode(curNode);
     };
 
-    Node* removeNode(Node* currentNode, int value) {
-        if (currentNode == nullptr) return currentNode;
-        if (value > currentNode->value)
-            currentNode->rightChild =
-                removeNode(currentNode->rightChild, value);
-        else if (value < currentNode->value)
-            currentNode->leftChild = removeNode(currentNode->leftChild, value);
+    Node* removeNode(Node* curNode, int value) {
+        if (curNode == nullptr) return curNode;
+        if (value > curNode->value)
+            curNode->right = removeNode(curNode->right, value);
+        else if (value < curNode->value)
+            curNode->left = removeNode(curNode->left, value);
         else {
-            if (currentNode->rightChild == nullptr) {
-                tempNode = currentNode->leftChild;
-                delete currentNode;
-                return currentNode->leftChild;
-            } else if (currentNode->leftChild == nullptr) {
-                tempNode = currentNode->rightChild;
-                delete currentNode;
-                return currentNode->rightChild;
+            if (curNode->right == nullptr) {
+                Node* tempNode = curNode->left;
+                delete curNode;
+                return curNode->left;
+            } else if (curNode->left == nullptr) {
+                Node* tempNode = curNode->right;
+                delete curNode;
+                return curNode->right;
             } else {
-                currentNode->value = findMaxNode(currentNode->leftChild)->value;
-                currentNode->leftChild =
-                    removeNode(currentNode->leftChild, currentNode->value);
+                curNode->value = findMaxNode(curNode->left)->value;
+                curNode->left = removeNode(curNode->left, curNode->value);
             }
         }
-        updateNode(currentNode);
-        return balanceNode(currentNode);
+        updateNode(curNode);
+        return balanceNode(curNode);
     };
 
-    Node* searchNode(Node* currentNode, int value) {
-        if (currentNode == nullptr || currentNode->value == value)
-            return currentNode;
-        if (value > currentNode->value)
-            return searchNode(currentNode->rightChild, value);
+    Node* searchNode(Node* curNode, int value) {
+        if (curNode == nullptr || curNode->value == value) return curNode;
+        if (value > curNode->value)
+            return searchNode(curNode->right, value);
         else
-            return searchNode(currentNode->leftChild, value);
+            return searchNode(curNode->left, value);
     }
 
-    Node* findMaxNode(Node* currentNode) {
-        if (currentNode->rightChild == nullptr) return currentNode;
-        return findMaxNode(currentNode->rightChild);
+    Node* findMaxNode(Node* curNode) {
+        if (curNode->right == nullptr) return curNode;
+        return findMaxNode(curNode->right);
     }
 
-    Node* findMinNode(Node* currentNode) {
-        if (currentNode->leftChild == nullptr) return currentNode;
-        return findMinNode(currentNode->leftChild);
+    Node* findMinNode(Node* curNode) {
+        if (curNode->left == nullptr) return curNode;
+        return findMinNode(curNode->left);
     }
 
-    Node* rotateLeft(Node* currentNode) {
-        Node* newParentNode = currentNode->rightChild;
-        currentNode->rightChild = newParentNode->leftChild;
-        newParentNode->leftChild = currentNode;
-        updateNode(currentNode);
-        updateNode(newParentNode);
-        return newParentNode;
+    Node* rotateLeft(Node* curNode) {
+        Node* newParent = curNode->right;
+        curNode->right = newParent->left;
+        newParent->left = curNode;
+        updateNode(curNode);
+        updateNode(newParent);
+        return newParent;
     }
 
-    Node* rotateRight(Node* currentNode) {
-        Node* newParentNode = currentNode->leftChild;
-        currentNode->leftChild = newParentNode->rightChild;
-        newParentNode->rightChild = currentNode;
-        updateNode(currentNode);
-        updateNode(newParentNode);
-        return newParentNode;
+    Node* rotateRight(Node* curNode) {
+        Node* newParent = curNode->left;
+        curNode->left = newParent->right;
+        newParent->right = curNode;
+        updateNode(curNode);
+        updateNode(newParent);
+        return newParent;
     }
 
-    void inOrderTraversal(Node* currentNode) {
-        inOrderTraversal(currentNode->leftChild);
-        cout << currentNode->value << "\n";
-        inOrderTraversal(currentNode->rightChild);
+    void inOrderTraversal(Node* curNode) {
+        inOrderTraversal(curNode->left);
+        cout << curNode->value << "\n";
+        inOrderTraversal(curNode->right);
     }
 
-    void preOrderTraversal(Node* currentNode) {
-        cout << currentNode->value << "\n";
-        preOrderTraversal(currentNode->leftChild);
-        preOrderTraversal(currentNode->rightChild);
+    void preOrderTraversal(Node* curNode) {
+        cout << curNode->value << "\n";
+        preOrderTraversal(curNode->left);
+        preOrderTraversal(curNode->right);
     }
 
-    void postOrderTraversal(Node* currentNode) {
-        postOrderTraversal(currentNode->rightChild);
-        cout << currentNode->value << "\n";
-        postOrderTraversal(currentNode->leftChild);
+    void postOrderTraversal(Node* curNode) {
+        postOrderTraversal(curNode->right);
+        cout << curNode->value << "\n";
+        postOrderTraversal(curNode->left);
     }
 
    public:
@@ -140,11 +136,16 @@ class AVLTree {
     bool insertNode(int value) {
         if (searchNode(value)) return false;
         rootNode = insertNode(rootNode, value);
-        treeSize++;
+        ++treeSize;
         return true;
     };
 
-    void removeNode(int value) { rootNode = removeNode(rootNode, value); };
+    bool removeNode(int value) {
+        if (!searchNode(value)) return false;
+        rootNode = removeNode(rootNode, value);
+        --treeSize;
+        return true;
+    };
 
     bool searchNode(int value) { return searchNode(rootNode, value); };
 
@@ -172,8 +173,8 @@ class AVLTree {
                 auto node = q.front();
                 cout << node->value << "\n";
                 q.pop();
-                if (node->rightChild != nullptr) q.push(node->rightChild);
-                if (node->leftChild != nullptr) q.push(node->leftChild);
+                if (node->right != nullptr) q.push(node->right);
+                if (node->left != nullptr) q.push(node->left);
             }
             cout << "\n";
         }
@@ -201,4 +202,5 @@ int main() {
     x.removeNode(4);
     x.removeNode(3);
     x.BFS();
+    cout << x.getSize() << "\n";
 }
