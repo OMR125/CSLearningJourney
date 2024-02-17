@@ -21,19 +21,18 @@ class BST {
         if (node == nullptr) {
             return std::make_shared<Node<T>>(data);
         }
-
+        
         if (data >= node->data) {
             node->right = insertNode(node->right, data);
         } else {
             node->left = insertNode(node->left, data);
         }
-
         return node;
     }
 
     std::shared_ptr<Node<T>> removeNode(std::shared_ptr<Node<T>> node, T data) {
         if (node == nullptr) return nullptr;
-
+        
         if (data > node->data) {
             node->right = removeNode(node->right, data);
         } else if (data < node->data) {
@@ -48,36 +47,30 @@ class BST {
                 node->left = removeNode(node->left, node->data);
             }
         }
-
         return node;
     }
 
     std::shared_ptr<Node<T>> searchNode(std::shared_ptr<Node<T>> node, T data) {
         if (node == nullptr || data == node->data) return node;
-        
         if (data > node->data) {
             return searchNode(node->right, data);
         }
-        
         return searchNode(node->left, data);
     }
 
    private:
     std::shared_ptr<Node<T>> findMax(std::shared_ptr<Node<T>> node) {
         if (node->right == nullptr) return node;
-
         return findMax(node->right);
     }
 
     std::shared_ptr<Node<T>> findMin(std::shared_ptr<Node<T>> node) {
         if (node->left == nullptr) return node;
-
         return findMin(node->left);
     }
 
     void printPreOrder(std::shared_ptr<Node<T>> node) {
         if (node == nullptr) return;
-
         std::cout << node->data << " ";
         printPreOrder(node->left);
         printPreOrder(node->right);
@@ -85,7 +78,6 @@ class BST {
 
     void printInOrder(std::shared_ptr<Node<T>> node) {
         if (node == nullptr) return;
-
         printInOrder(node->left);
         std::cout << node->data << " ";
         printInOrder(node->right);
@@ -93,7 +85,6 @@ class BST {
 
     void printPostOrder(std::shared_ptr<Node<T>> node) {
         if (node == nullptr) return;
-
         printPostOrder(node->right);
         std::cout << node->data << " ";
         printPostOrder(node->left);
@@ -121,14 +112,15 @@ class BST {
     void BFS() {
         std::queue<std::shared_ptr<Node<T>>> q;
         q.push(root);
-
         while (!q.empty()) {
-            auto node = q.front();
-            std::cout << node->data << "\n";
-            q.pop();
-
-            if (node->right != nullptr) q.push(node->right);
-            if (node->left != nullptr) q.push(node->left);
+            int curSize = q.size();
+            while(curSize--){
+                auto node = q.front();
+                std::cout << node->data << "\n";
+                q.pop();
+                if (node->right != nullptr) q.push(node->right);
+                if (node->left != nullptr) q.push(node->left);
+            }
         }
     }
 };
