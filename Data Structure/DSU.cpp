@@ -1,18 +1,20 @@
-#include <bits./stdc++.h>
+#include <iostream>
+#include <numeric>
+#include <vector>
 
 using namespace std;
-class DSU {
+class DisjointSetUnion {
    private:
-    vector<int> parent, sz;
-    int sets, _size;
+    vector<int> parentVector, sizeVector;
+    int numberOfSets, totalSize;
 
    public:
-    DSU(int n) {
-        parent = sz = vector<int>(n, 1);
-        iota(parent.begin(), parent.end(), 0);
-        sets = _size = n;
+    DisjointSetUnion(int n) {
+        parentVector = sizeVector = vector<int>(n, 1);
+        iota(parentVector.begin(), parentVector.end(), 0);
+        numberOfSets = totalSize = n;
     }
-    int Find(int x) {
+    int findSet(int x) {
         /* recursive way is more elegant and easier to understand but when the
         DSU is very large there's a potential Stack Overflow
         if (parent[x] == x) return x;
@@ -20,30 +22,31 @@ class DSU {
 
         // iterative method avoids the Stack Overflow problem and it handles
         // larger data sets and deeper trees better.
-        while (x != parent[x]) x = parent[x] = parent[parent[x]];
+
+        while (x != parentVector[x])
+            x = parentVector[x] = parentVector[parentVector[x]];
         return x;
     }
-    void Union(int x, int y) {
-        x = Find(x);
-        y = Find(y);
+    void unionSets(int x, int y) {
+        x = findSet(x);
+        y = findSet(y);
         if (x == y) return;
-        if (sz[x] < sz[y])
-            swap(x, y);
-        parent[y] = x;
-        sz[x] += sz[y];
-        sets--;
+        if (sizeVector[x] < sizeVector[y]) swap(x, y);
+        parentVector[y] = x;
+        sizeVector[x] += sizeVector[y];
+        numberOfSets--;
     }
-    int NumOfComponents() { return sets; }
-    int ComponentSize(int x) { return sz[Find(x)]; }
-    int size() { return _size; }
+    int getNumberOfComponents() { return numberOfSets; }
+    int getComponentSize(int x) { return sizeVector[findSet(x)]; }
+    int getSize() { return totalSize; }
 };
 
 int main() {
-    DSU dsu(5);
-    dsu.Union(0, 1);
-    dsu.Union(1, 2);
-    dsu.Union(3, 4);
-    cout << dsu.Find(4) << "\n";
-    dsu.Union(4, 1);
-    cout << dsu.Find(4) << " " << dsu.Find(2) << "\n";
+    DisjointSetUnion dsu(5);
+    dsu.unionSets(0, 1);
+    dsu.unionSets(1, 2);
+    dsu.unionSets(3, 4);
+    cout << dsu.findSet(4) << "\n";
+    dsu.unionSets(4, 1);
+    cout << dsu.findSet(4) << " " << dsu.findSet(2) << "\n";
 }
