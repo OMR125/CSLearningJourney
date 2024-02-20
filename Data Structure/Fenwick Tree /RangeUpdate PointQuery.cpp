@@ -2,38 +2,39 @@
 
 using namespace std;
 
+template <typename T>
 class Fenwick {
    private:
     int n;
-    vector<int> Tree;
+    vector<T> Tree;
 
    public:
     Fenwick(int n = 0) { init(n); }
     void init(int _n) {
         n = _n + 1;
-        Tree.assign(n, 0);
+        Tree.assign(n, T{});
     }
-    void build(vector<int> &arr) {
+    void build(vector<T> &arr) {
         int n = arr.size();
         init(n);
         for (int i = 0; i < n; i++) range_update(i, i, arr[i]);
     }
-    void add(int i, int value) {
+    void update(int i, T value) {
         for (++i; i <= n; i += i & -i) Tree[i] += value;
     }
-    void range_update(int l, int r, int value) {
-        add(l, value);
-        add(r + 1, -value);
+    void range_update(int l, int r, T value) {
+        update(l, value);
+        update(r + 1, -value);
     }
-    int sum(int i) {
-        int ans = 0;
+    T sum(int i) {
+        T ans{};
         for (++i; i > 0; i -= i & -i) ans += Tree[i];
         return ans;
     }
-    int Query(int i) { return sum(i); }
+    T Query(int i) { return sum(i); }
 };
 int main() {
-    Fenwick F;
+    Fenwick<int> F;
     vector<int> arr(10);
     for (int i = 0; i < 10; i++) arr[i] = i + 1;
     F.build(arr);
