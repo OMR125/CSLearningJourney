@@ -19,14 +19,14 @@ class Fenwick {
         init(n);
         for (int i = 0; i < n; i++) range_update(i, i, arr[i]);
     }
-    void add(vector<int> &arr, int i, int value) {
+    void update(vector<int> &arr, int i, int value) {
         for (++i; i <= n; i += i & -i) arr[i] += value;
     }
     void range_update(int l, int r, int value) {
-        add(Tree1, l, value);
-        add(Tree1, r + 1, -value);
-        add(Tree2, l, value * (l - 1));
-        add(Tree2, r + 1, -value * r);
+        update(Tree1, l, value);
+        update(Tree1, r + 1, -value);
+        update(Tree2, l, value * (l - 1));
+        update(Tree2, r + 1, -value * r);
     }
     int sum(vector<int> &arr, int i) {
         int ans = 0;
