@@ -20,7 +20,7 @@ class Fenwick {
         for (int i = 0; i < n; i++) range_update(i, i, arr[i]);
     }
     void update(int i, T value) {
-        for (++i; i <= n; i += i & -i) Tree[i] += value;
+        for (++i; i < n; i += i & -i) Tree[i] += value;
     }
     void range_update(int l, int r, T value) {
         update(l, value);
