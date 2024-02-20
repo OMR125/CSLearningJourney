@@ -14,8 +14,7 @@ class Fenwick {
         Tree.assign(n, T{});
     }
     void build(vector<T> &arr) {
-        int n = arr.size();
-        init(n);
+        init(arr.size());
         for (int i = 0; i < n; i++) update(i, arr[i]);
     }
     void update(int i, T value) {
