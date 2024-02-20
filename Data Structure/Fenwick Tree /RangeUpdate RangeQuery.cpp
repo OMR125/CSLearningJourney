@@ -15,12 +15,11 @@ class Fenwick {
         Tree2.assign(n, 0);
     }
     void build(vector<int> &arr) {
-        int n = arr.size();
-        init(n);
+        init(arr.size());
         for (int i = 0; i < n; i++) range_update(i, i, arr[i]);
     }
     void update(vector<int> &arr, int i, int value) {
-        for (++i; i <= n; i += i & -i) arr[i] += value;
+        for (++i; i < n; i += i & -i) arr[i] += value;
     }
     void range_update(int l, int r, int value) {
         update(Tree1, l, value);
